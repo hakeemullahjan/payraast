@@ -4,9 +4,11 @@ import { useState } from "react";
 export default function CopyButton({
   value,
   label,
+  className,
 }: {
   value: string;
   label: string;
+  className?: string;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -25,14 +27,14 @@ export default function CopyButton({
       type="button"
       onClick={handleCopy}
       aria-label={label}
-      className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-navy-100 bg-white px-2.5 py-1.5 text-xs font-medium text-navy-700 transition hover:bg-navy-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-dark-700 bg-dark-850 px-2.5 py-1.5 text-xs font-medium text-dark-200 transition hover:border-brand-yellow/50 hover:bg-dark-800 hover:text-brand-yellow focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-yellow ${className ?? ""}`}
     >
       {copied ? (
-        <Check className="h-3.5 w-3.5 text-emerald-600" aria-hidden="true" />
+        <Check className="h-3.5 w-3.5 text-brand-yellow" aria-hidden="true" />
       ) : (
-        <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+        <Copy className="h-3.5 w-3.5 text-dark-400 group-hover:text-brand-yellow" aria-hidden="true" />
       )}
-      {copied ? "Copied" : "Copy"}
+      <span>{copied ? "Copied" : "Copy"}</span>
     </button>
   );
 }

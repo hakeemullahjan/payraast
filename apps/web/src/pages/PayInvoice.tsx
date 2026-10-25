@@ -10,8 +10,12 @@ import {
   ChevronDown,
   ExternalLink,
   Loader2,
+  Lock,
+  QrCode as QrIcon,
   ShieldCheck,
+  Sparkles,
   Wallet,
+  Zap,
 } from "lucide-react";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -34,19 +38,29 @@ import { formatAmount, formatDate, shortAddress } from "../lib/format";
 
 function Shell({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-navy-100 bg-white">
-        <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
-          <Link to="/" className="text-lg font-bold tracking-tight text-navy-900">
-            PayRaast
+    <div className="min-h-screen bg-dark-950 text-dark-100 flex flex-col">
+      <header className="border-b border-dark-800/80 bg-dark-950/80 backdrop-blur-md sticky top-0 z-30">
+        <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3 sm:px-6">
+          <Link to="/" className="flex items-center gap-2 group">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-yellow text-dark-950 shadow-sm transition group-hover:scale-105">
+              <Zap className="h-4 w-4 fill-dark-950 stroke-[2.5]" aria-hidden="true" />
+            </div>
+            <span className="text-base font-black tracking-tight text-white flex items-center gap-1">
+              Pay<span className="text-brand-yellow">Raast</span>
+            </span>
           </Link>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
-            <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-            Stellar Testnet
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-dark-700 bg-dark-900 px-3 py-1 text-xs font-medium text-dark-300">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand-yellow animate-pulse" />
+              <span>Stellar Testnet</span>
+            </span>
+          </div>
         </div>
       </header>
-      <main className="mx-auto max-w-2xl px-4 py-8">{children}</main>
+      <main className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 flex-1">{children}</main>
+      <footer className="border-t border-dark-800/60 py-6 text-center text-xs text-dark-500">
+        <p>Verified cryptographically on Stellar Horizon &bull; Non-custodial checkout</p>
+      </footer>
     </div>
   );
 }
@@ -199,10 +213,8 @@ export default function PayInvoice() {
     setPaymentError(null);
 
     try {
-      // 1. Ask backend to build the unsigned payment transaction XDR
       const { xdr } = await buildTransaction(invoice.id, walletAddress);
 
-      // 2. Request user to review and sign via Freighter wallet
       setPaymentStep("signing");
       const signResult = await signTransaction(xdr, {
         networkPassphrase: STELLAR_CONFIG.networkPassphrase,
@@ -220,7 +232,6 @@ export default function PayInvoice() {
         throw new Error(errorMsg);
       }
 
-      // 3. Submit and verify transaction on Stellar Testnet
       setPaymentStep("submitting");
       const verified = await submitPayment(invoice.id, signedTxXdr);
 
@@ -267,7 +278,7 @@ export default function PayInvoice() {
   if (loading) {
     return (
       <Shell>
-        <Spinner label="Loading invoice" />
+        <Spinner label="Loading checkout" />
       </Shell>
     );
   }
@@ -275,11 +286,10 @@ export default function PayInvoice() {
   if (error?.code === "INVOICE_NOT_FOUND") {
     return (
       <Shell>
-        <div className="py-16 text-center">
-          <h1 className="text-xl font-bold text-navy-900">Invoice not found</h1>
-          <p className="mt-1 text-sm text-navy-500">
-            This payment link is invalid or the invoice no longer exists. Ask the
-            sender for a new link.
+        <div className="rounded-2xl border border-dark-800 bg-dark-900 p-8 text-center">
+          <h1 className="text-xl font-bold text-white">Invoice Not Found</h1>
+          <p className="mt-2 text-sm text-dark-400">
+            This payment link is invalid or the invoice no longer exists.
           </p>
         </div>
       </Shell>
@@ -302,288 +312,306 @@ export default function PayInvoice() {
 
   return (
     <Shell>
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="text-sm text-navy-500">Invoice for {invoice.clientName}</p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy-900">
-            {invoice.projectTitle}
-          </h1>
+      <div className="space-y-6">
+        {/* Top Invoice Banner */}
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-dark-400">
+              Invoice for {invoice.clientName}
+            </p>
+            <h1 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">
+              {invoice.projectTitle}
+            </h1>
+          </div>
+          <StatusBadge status={invoice.status} />
         </div>
-        <StatusBadge status={invoice.status} />
-      </div>
 
-      <div className="mt-6 rounded-xl border border-navy-100 bg-white p-5 shadow-sm sm:p-6">
-        <p className="text-sm text-navy-500">Amount due</p>
-        <p className="mt-1 text-3xl font-bold tracking-tight text-navy-900">
-          {formatAmount(invoice.amount, invoice.assetCode)}
-        </p>
-        <p className="mt-1 text-xs text-navy-500">
-          Stellar Testnet {invoice.assetCode}. No real monetary value.
-        </p>
+        {/* Amount Card */}
+        <div className="rounded-2xl border border-dark-750 bg-dark-900 p-6 shadow-xl sm:p-7">
+          <div className="flex items-baseline justify-between border-b border-dark-800 pb-5">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-dark-400">Amount Due</p>
+              <p className="mt-1 text-3xl font-black font-mono tracking-tight text-brand-yellow sm:text-4xl">
+                {formatAmount(invoice.amount, invoice.assetCode)}
+              </p>
+              <p className="text-[11px] text-dark-400 mt-1">
+                Stellar Testnet &bull; Fast, non-custodial settlement
+              </p>
+            </div>
+            <span className="rounded-lg border border-dark-700 bg-dark-800 px-3 py-1 text-xs font-mono font-semibold text-brand-yellow">
+              {invoice.assetCode}
+            </span>
+          </div>
 
-        {!isPaid ? (
-          <div className="mt-4 flex justify-center">
-            <div className="rounded-xl bg-white p-3 shadow-sm border border-navy-100">
+          <dl className="mt-5 divide-y divide-dark-800 text-sm">
+            {invoice.description ? (
+              <div className="grid gap-1 py-3 sm:grid-cols-3 sm:gap-4">
+                <dt className="text-xs font-semibold uppercase tracking-wider text-dark-400">Description</dt>
+                <dd className="text-dark-200 sm:col-span-2">{invoice.description}</dd>
+              </div>
+            ) : null}
+            {invoice.dueDate ? (
+              <div className="grid gap-1 py-3 sm:grid-cols-3 sm:gap-4">
+                <dt className="text-xs font-semibold uppercase tracking-wider text-dark-400">Due date</dt>
+                <dd className="font-mono text-dark-200 sm:col-span-2">{formatDate(invoice.dueDate)}</dd>
+              </div>
+            ) : null}
+            <div className="grid gap-1 py-3 sm:grid-cols-3 sm:gap-4">
+              <dt className="text-xs font-semibold uppercase tracking-wider text-dark-400">Recipient</dt>
+              <dd className="sm:col-span-2">
+                <div className="flex items-center gap-2">
+                  <code className="min-w-0 flex-1 truncate rounded-lg bg-dark-950 p-2 font-mono text-xs text-brand-yellow/90 border border-dark-800">
+                    {invoice.recipientAddress}
+                  </code>
+                  <CopyButton
+                    value={invoice.recipientAddress}
+                    label="Copy recipient address"
+                  />
+                </div>
+              </dd>
+            </div>
+          </dl>
+
+          {!isPaid ? (
+            <div className="mt-6 flex flex-col items-center justify-center border-t border-dark-800 pt-5">
+              <p className="text-xs font-medium text-dark-400 mb-2.5 flex items-center gap-1.5">
+                <QrIcon className="h-3.5 w-3.5 text-brand-yellow" />
+                Scan to pay with mobile Stellar wallet
+              </p>
               <QrCode
                 value={`${window.location.origin}/pay/${invoice.id}`}
                 label={`QR code for invoice ${invoice.id}`}
               />
             </div>
-          </div>
-        ) : null}
-
-        <dl className="mt-5 divide-y divide-navy-100 border-t border-navy-100 text-sm">
-          {invoice.description ? (
-            <div className="grid gap-1 py-3 sm:grid-cols-3 sm:gap-4">
-              <dt className="text-navy-500">Description</dt>
-              <dd className="text-navy-900 sm:col-span-2">
-                {invoice.description}
-              </dd>
-            </div>
           ) : null}
-          {invoice.dueDate ? (
-            <div className="grid gap-1 py-3 sm:grid-cols-3 sm:gap-4">
-              <dt className="text-navy-500">Due date</dt>
-              <dd className="text-navy-900 sm:col-span-2">
-                {formatDate(invoice.dueDate)}
-              </dd>
-            </div>
-          ) : null}
-          <div className="grid gap-1 py-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="text-navy-500">Pay to</dt>
-            <dd className="sm:col-span-2">
-              <div className="flex items-center gap-2">
-                <code className="min-w-0 flex-1 break-all font-mono text-xs text-navy-900">
-                  {invoice.recipientAddress}
-                </code>
-                <CopyButton
-                  value={invoice.recipientAddress}
-                  label="Copy recipient address"
-                />
-              </div>
-            </dd>
-          </div>
-        </dl>
-      </div>
-
-      {/* PAID STATE */}
-      {isPaid ? (
-        <div className="mt-6 rounded-xl border border-emerald-100 bg-emerald-50 p-6 text-center shadow-sm">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-            <CheckCircle2 className="h-6 w-6" aria-hidden="true" />
-          </div>
-          <h2 className="mt-3 text-lg font-bold text-emerald-950">
-            This invoice is paid!
-          </h2>
-          <p className="mt-1 text-sm text-emerald-800">
-            Transaction was independently verified on Stellar Testnet.
-          </p>
-          {payment?.transactionHash ? (
-            <div className="mt-4 flex flex-col items-center gap-2">
-              <a
-                href={getExplorerTxUrl(payment.transactionHash)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 underline underline-offset-2 hover:text-emerald-800"
-              >
-                View transaction on Stellar Expert
-                <ExternalLink className="h-3 w-3" aria-hidden="true" />
-              </a>
-            </div>
-          ) : null}
-          <div className="mt-5">
-            <Link
-              to={`/receipt/${invoice.id}`}
-              className="inline-flex items-center rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-800"
-            >
-              View verified receipt &rarr;
-            </Link>
-          </div>
         </div>
-      ) : isCancelled ? (
-        <div className="mt-6 rounded-xl border border-navy-100 bg-white p-4 text-center text-sm text-navy-600">
-          This invoice was cancelled and can no longer be paid.
-        </div>
-      ) : (
-        /* PENDING PAYMENT FLOW */
-        <div className="mt-6 space-y-4">
-          <div className="rounded-xl border border-navy-100 bg-white p-5 shadow-sm sm:p-6">
-            <h2 className="text-base font-semibold text-navy-900">
-              Pay with Stellar Wallet
+
+        {/* PAID STATE */}
+        {isPaid ? (
+          <div className="rounded-2xl border border-brand-yellow/40 bg-dark-900 p-8 text-center shadow-[0_0_30px_-5px_rgba(250,204,21,0.25)]">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-yellow/15 text-brand-yellow border border-brand-yellow/30">
+              <CheckCircle2 className="h-8 w-8" aria-hidden="true" />
+            </div>
+            <h2 className="mt-4 text-xl font-bold text-white">
+              Invoice Paid Successfully!
             </h2>
-            <p className="mt-1 text-xs text-navy-500">
-              Connect your Freighter wallet to sign and submit payment on Testnet.
+            <p className="mt-1 text-sm text-dark-300">
+              Transaction independently verified on Stellar Testnet Horizon.
             </p>
-
-            {walletError ? (
-              <div className="mt-4">
-                <ErrorBox message={walletError} />
+            {payment?.transactionHash ? (
+              <div className="mt-4 flex flex-col items-center gap-2">
+                <a
+                  href={getExplorerTxUrl(payment.transactionHash)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-yellow hover:text-brand-yellowHover underline underline-offset-2"
+                >
+                  <span>View transaction on Stellar Expert</span>
+                  <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                </a>
               </div>
             ) : null}
-
-            {paymentError ? (
-              <div className="mt-4">
-                <ErrorBox message={paymentError} />
-              </div>
-            ) : null}
-
-            <div className="mt-5">
-              {freighterInstalled === false ? (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-xs text-amber-800">
-                  <p className="font-semibold">Freighter wallet not detected</p>
-                  <p className="mt-1">
-                    To pay directly with one click, please install the{" "}
-                    <a
-                      href="https://www.freighter.app/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-medium underline hover:text-amber-950"
-                    >
-                      Freighter browser extension
-                    </a>
-                    . You can also send the payment manually and verify the transaction hash below.
+            <div className="mt-6">
+              <Link
+                to={`/receipt/${invoice.id}`}
+                className="inline-flex items-center gap-2 rounded-xl bg-brand-yellow px-5 py-2.5 text-xs font-bold text-dark-950 shadow-md transition hover:bg-brand-yellowHover hover:scale-105"
+              >
+                <span>View Verified Receipt &rarr;</span>
+              </Link>
+            </div>
+          </div>
+        ) : isCancelled ? (
+          <div className="rounded-2xl border border-dark-800 bg-dark-900 p-6 text-center text-sm text-dark-400">
+            This invoice was cancelled and can no longer be paid.
+          </div>
+        ) : (
+          /* PAYMENT CHECKOUT */
+          <div className="space-y-5">
+            <div className="rounded-2xl border border-dark-750 bg-dark-900 p-6 shadow-xl sm:p-7">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-base font-bold text-white">
+                    Pay with Stellar Wallet
+                  </h2>
+                  <p className="mt-0.5 text-xs text-dark-400">
+                    Connect your Freighter wallet to review and approve payment in one click.
                   </p>
                 </div>
-              ) : !walletAddress ? (
-                <button
-                  type="button"
-                  onClick={handleConnectWallet}
-                  disabled={connectingWallet}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:opacity-60"
-                >
-                  {connectingWallet ? (
-                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                  ) : (
-                    <Wallet className="h-4 w-4" aria-hidden="true" />
-                  )}
-                  {connectingWallet ? "Connecting wallet..." : "Connect Freighter Wallet"}
-                </button>
-              ) : (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between rounded-lg bg-navy-50 px-3.5 py-2.5 text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                      <span className="font-mono text-navy-800">
-                        {shortAddress(walletAddress)}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setWalletAddress(null)}
-                      className="text-navy-500 hover:text-navy-900 underline"
-                    >
-                      Disconnect
-                    </button>
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-yellow/10 text-brand-yellow">
+                  <Wallet className="h-5 w-5" />
+                </div>
+              </div>
+
+              {walletError ? (
+                <div className="mt-4">
+                  <ErrorBox message={walletError} />
+                </div>
+              ) : null}
+
+              {paymentError ? (
+                <div className="mt-4">
+                  <ErrorBox message={paymentError} />
+                </div>
+              ) : null}
+
+              <div className="mt-5">
+                {freighterInstalled === false ? (
+                  <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-200">
+                    <p className="font-bold text-amber-300">Freighter Wallet Not Detected</p>
+                    <p className="mt-1 leading-relaxed">
+                      To approve this invoice with 1 click, install the{" "}
+                      <a
+                        href="https://www.freighter.app/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-bold text-brand-yellow underline hover:text-white"
+                      >
+                        Freighter Extension
+                      </a>
+                      . Alternatively, submit manual transaction hash below.
+                    </p>
                   </div>
-
-                  {trustlineSuccess ? (
-                    <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-800">
-                      {trustlineSuccess}
-                    </div>
-                  ) : null}
-
+                ) : !walletAddress ? (
                   <button
                     type="button"
-                    onClick={handlePayWithFreighter}
-                    disabled={paymentStep !== "idle" && paymentStep !== "error"}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    onClick={handleConnectWallet}
+                    disabled={connectingWallet}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-yellow px-5 py-3 text-sm font-bold text-dark-950 shadow-[0_0_20px_-3px_rgba(250,204,21,0.3)] transition hover:bg-brand-yellowHover hover:shadow-yellowGlow active:scale-95 disabled:opacity-60"
                   >
-                    {paymentStep === "building" ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                        Preparing transaction...
-                      </>
-                    ) : paymentStep === "signing" ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                        Approve payment in Freighter...
-                      </>
-                    ) : paymentStep === "submitting" ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                        Submitting and verifying on Testnet...
-                      </>
+                    {connectingWallet ? (
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                     ) : (
-                      <>
-                        <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-                        Pay {formatAmount(invoice.amount, invoice.assetCode)}
-                      </>
+                      <Wallet className="h-4 w-4 fill-dark-950 stroke-[2]" aria-hidden="true" />
                     )}
+                    <span>{connectingWallet ? "Connecting Freighter..." : "Connect Freighter Wallet"}</span>
                   </button>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between rounded-xl border border-dark-700 bg-dark-950 px-4 py-2.5 text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-brand-yellow animate-pulse" />
+                        <span className="font-mono text-dark-200">
+                          {shortAddress(walletAddress)}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setWalletAddress(null)}
+                        className="text-xs font-semibold text-dark-400 hover:text-white underline"
+                      >
+                        Disconnect
+                      </button>
+                    </div>
 
-                  <div className="pt-1 text-center">
+                    {trustlineSuccess ? (
+                      <div className="rounded-xl border border-brand-yellow/30 bg-brand-yellow/10 p-3 text-xs text-brand-yellow">
+                        {trustlineSuccess}
+                      </div>
+                    ) : null}
+
                     <button
                       type="button"
-                      onClick={handleEstablishTrustline}
-                      disabled={trustlineAdding}
-                      className="inline-flex items-center gap-1.5 text-xs text-navy-500 hover:text-navy-900 underline"
+                      onClick={handlePayWithFreighter}
+                      disabled={paymentStep !== "idle" && paymentStep !== "error"}
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-yellow px-5 py-3.5 text-sm font-bold text-dark-950 shadow-[0_0_25px_-5px_rgba(250,204,21,0.35)] transition hover:bg-brand-yellowHover hover:shadow-yellowGlow active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      {trustlineAdding ? (
-                        <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
-                      ) : null}
-                      {trustlineAdding
-                        ? "Approving trustline in Freighter..."
-                        : "First time paying? Add USDC Trustline to your wallet"}
+                      {paymentStep === "building" ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin text-dark-950" aria-hidden="true" />
+                          <span>Preparing transaction XDR...</span>
+                        </>
+                      ) : paymentStep === "signing" ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin text-dark-950" aria-hidden="true" />
+                          <span>Approve in Freighter popup...</span>
+                        </>
+                      ) : paymentStep === "submitting" ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin text-dark-950" aria-hidden="true" />
+                          <span>Verifying on Stellar Testnet...</span>
+                        </>
+                      ) : (
+                        <>
+                          <ShieldCheck className="h-4 w-4 fill-dark-950 stroke-[2]" aria-hidden="true" />
+                          <span>Pay {formatAmount(invoice.amount, invoice.assetCode)}</span>
+                        </>
+                      )}
                     </button>
+
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        onClick={handleEstablishTrustline}
+                        disabled={trustlineAdding}
+                        className="inline-flex items-center gap-1.5 text-xs text-dark-400 hover:text-brand-yellow transition"
+                      >
+                        {trustlineAdding ? (
+                          <Loader2 className="h-3 w-3 animate-spin text-brand-yellow" aria-hidden="true" />
+                        ) : null}
+                        <span>
+                          {trustlineAdding
+                            ? "Approving trustline in wallet..."
+                            : "First time paying? Add USDC Trustline to your wallet"}
+                        </span>
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+            </div>
+
+            {/* MANUAL VERIFICATION ACCORDION */}
+            <div className="rounded-2xl border border-dark-800 bg-dark-900/80 p-5">
+              <button
+                type="button"
+                onClick={() => setShowManual(!showManual)}
+                className="flex w-full items-center justify-between text-left text-xs font-semibold text-dark-400 hover:text-white transition"
+              >
+                <span>Paid using another wallet or Stellar Laboratory?</span>
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform ${showManual ? "rotate-180 text-brand-yellow" : ""}`}
+                  aria-hidden="true"
+                />
+              </button>
+
+              {showManual ? (
+                <form onSubmit={handleManualVerify} className="mt-4 space-y-3 pt-3 border-t border-dark-800">
+                  <p className="text-xs text-dark-400">
+                    Paste your 64-character Stellar Testnet transaction hash here. Our
+                    backend independently validates the payment against Horizon.
+                  </p>
+
+                  {manualError ? <ErrorBox message={manualError} /> : null}
+
+                  <div>
+                    <input
+                      id="txHash"
+                      type="text"
+                      spellCheck={false}
+                      placeholder="e.g. 5f04a... (64 hex characters)"
+                      value={manualTxHash}
+                      onChange={(e) => setManualTxHash(e.target.value)}
+                      className="block w-full rounded-xl border border-dark-700 bg-dark-950 px-3.5 py-2.5 font-mono text-xs text-white placeholder-dark-500 focus:border-brand-yellow focus:outline-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={manualSubmitting || !manualTxHash.trim()}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-dark-800 px-4 py-2.5 text-xs font-bold text-white hover:bg-dark-750 transition disabled:opacity-50"
+                  >
+                    {manualSubmitting ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin text-brand-yellow" aria-hidden="true" />
+                    ) : null}
+                    <span>{manualSubmitting ? "Verifying on Testnet..." : "Verify Transaction"}</span>
+                  </button>
+                </form>
+              ) : null}
             </div>
           </div>
-
-          {/* MANUAL TX HASH VERIFICATION ACCORDION */}
-          <div className="rounded-xl border border-navy-100 bg-white p-5 shadow-sm">
-            <button
-              type="button"
-              onClick={() => setShowManual(!showManual)}
-              className="flex w-full items-center justify-between text-left text-xs font-medium text-navy-600 hover:text-navy-900"
-            >
-              <span>Paid using another wallet or Stellar Lab?</span>
-              <ChevronDown
-                className={`h-4 w-4 transition-transform ${showManual ? "rotate-180" : ""}`}
-                aria-hidden="true"
-              />
-            </button>
-
-            {showManual ? (
-              <form onSubmit={handleManualVerify} className="mt-4 space-y-3">
-                <p className="text-xs text-navy-500">
-                  Paste your 64-character Stellar Testnet transaction hash here. Our
-                  backend will independently verify the payment on Horizon.
-                </p>
-
-                {manualError ? <ErrorBox message={manualError} /> : null}
-
-                <div>
-                  <label htmlFor="txHash" className="sr-only">
-                    Transaction hash
-                  </label>
-                  <input
-                    id="txHash"
-                    type="text"
-                    spellCheck={false}
-                    placeholder="Transaction hash (64 hex characters)"
-                    value={manualTxHash}
-                    onChange={(e) => setManualTxHash(e.target.value)}
-                    className="block w-full rounded-lg border border-navy-200 bg-white px-3 py-2 font-mono text-xs text-navy-900 placeholder:text-navy-300 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={manualSubmitting || !manualTxHash.trim()}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-navy-900 px-4 py-2 text-xs font-medium text-white transition hover:bg-navy-800 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {manualSubmitting ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-                  ) : null}
-                  {manualSubmitting ? "Verifying on Testnet..." : "Verify payment"}
-                </button>
-              </form>
-            ) : null}
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </Shell>
   );
 }
+

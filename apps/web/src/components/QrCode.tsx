@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
+import { Loader2 } from "lucide-react";
 
 export default function QrCode({
   value,
@@ -20,7 +21,12 @@ export default function QrCode({
     QRCode.toString(value, {
       type: "svg",
       errorCorrectionLevel: "M",
-      width: 180,
+      width: 170,
+      margin: 1,
+      color: {
+        dark: "#0a0a0d",
+        light: "#ffffff",
+      },
     })
       .then((data) => {
         if (active) setSvg(data);
@@ -35,7 +41,7 @@ export default function QrCode({
 
   if (error) {
     return (
-      <div className="flex items-center justify-center py-4 text-sm text-navy-500">
+      <div className="flex items-center justify-center py-4 text-xs text-dark-400">
         QR code unavailable
       </div>
     );
@@ -44,36 +50,17 @@ export default function QrCode({
   if (svg === null) {
     return (
       <div
-        className={`flex items-center justify-center py-3 text-navy-400 ${className ?? ""}`}
+        className={`flex items-center justify-center py-8 text-brand-yellow ${className ?? ""}`}
         aria-label={label}
       >
-        <svg
-          className="h-4 w-4 animate-spin"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-            fill="none"
-          />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.172 5.824 3 7.938l3-2.647z"
-          />
-        </svg>
+        <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
       </div>
     );
   }
 
   return (
     <div
-      className={className}
+      className={`rounded-xl bg-white p-3 shadow-lg shadow-black/50 ${className ?? ""}`}
       dangerouslySetInnerHTML={{ __html: svg }}
       aria-label={label}
     />
