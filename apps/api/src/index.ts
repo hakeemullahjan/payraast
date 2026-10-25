@@ -8,7 +8,7 @@ import { openDatabase } from "./db.js";
 import { createInvoicesRepository } from "./invoices.js";
 import { apiError, createInvoicesRouter } from "./routes/invoices.js";
 
-const port = Number(process.env.API_PORT ?? 4000);
+const port = Number(process.env.PORT ?? process.env.API_PORT ?? 4000);
 const webOrigin = process.env.WEB_ORIGIN ?? "http://localhost:5173";
 const databasePath = process.env.DATABASE_PATH ?? "./data/payraast.db";
 
