@@ -156,12 +156,12 @@ export async function buildPaymentTransaction(params: {
 
   const senderUsdc = senderAccount.balances.find(
     (b) =>
-      b.asset_type !== "native" &&
+      "asset_code" in b &&
       b.asset_code === invoice.assetCode &&
       b.asset_issuer === expectedIssuer
   );
 
-  if (!senderUsdc) {
+  if (!senderUsdc || !("balance" in senderUsdc)) {
     throw new PaymentVerificationError(
       "SENDER_NO_TRUSTLINE",
       "Your connected wallet does not have a trustline for Testnet USDC. Click 'Add USDC Trustline' below to enable USDC."
@@ -195,7 +195,7 @@ export async function buildPaymentTransaction(params: {
 
   const recipientHasTrustline = recipientAccount.balances.some(
     (b) =>
-      b.asset_type !== "native" &&
+      "asset_code" in b &&
       b.asset_code === invoice.assetCode &&
       b.asset_issuer === expectedIssuer
   );
