@@ -28,7 +28,7 @@ export default function QrCode({
         light: "#ffffff",
       },
     })
-      .then((data) => {
+      .then((data: string) => {
         if (active) setSvg(data);
       })
       .catch(() => {
