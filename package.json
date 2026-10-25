@@ -1,0 +1,23 @@
+{
+  "name": "payraast",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PayRaast - Get paid globally. Keep your money in stable value.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace @payraast/web",
+    "dev:api": "npm run dev --workspace @payraast/api",
+    "build": "npm run build --workspace @payraast/web",
+    "test": "npm run test --workspace @payraast/api",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.6"
+  }
+}
