@@ -249,7 +249,7 @@ no terminal commands.
 | 11 | Receipt and Explorer link               | CODED — NOT RUN  | FI: `Receipt.tsx` (`/receipt/:id`), inline receipt in `PayInvoice.tsx`, and `getExplorerTxUrl` linking to Stellar Expert Testnet. |
 | 12 | Loading, empty, error, success states   | CODED — NOT RUN  | FI: Granular states for wallet connection, tx building, signing, submitting, backend verification, and error recovery. |
 | 13 | Tests for critical logic                | CODED — NOT RUN  | FI: `amounts.test.ts` (precision stroop conversion tests) and `schemas.test.ts` (Zod validation and SQLite replay attack protection). Run via `npm run test`. |
-| 14 | README, `.env.example`, demo script     | CODED — NOT RUN  | FI: Updated `.env.example`, `.env`, and complete `README.md` with step-by-step setup, wallet instructions, and demo script. |
+| 14 | README, `.env.example`, demo script     | CODED — NOT RUN  | FI: Updated `.env.example`, `.env`, and complete `README.md` with step-by-step setup, wallet instructions, and demo script. Created 5-slide LaTeX Beamer pitch deck in `pitch-deck/main.tex` and `pitch-deck/README.md`. |
 | 15 | Final end-to-end Testnet demo           | NOT STARTED      | Requires user run on Testnet. |
 
 ### Current checkpoint

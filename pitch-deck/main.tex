@@ -1,0 +1,480 @@
+\documentclass[aspectratio=169, 10pt, t]{beamer}
+
+% ------------------------------------------------------------------------------
+% PayRaast Pitch Deck — HackMeridian 2026 (Lisbon)
+% Built on Stellar
+% Professional Startup Pitch Design System
+% ------------------------------------------------------------------------------
+
+\usepackage{iftex}
+\ifxetex
+  \usepackage{fontspec}
+  \defaultfontfeatures{Ligatures=TeX}
+  \IfFontExistsTF{Inter}{
+    \setsansfont{Inter}[Scale=0.96]
+  }{
+    \IfFontExistsTF{TeX Gyre Heros}{
+      \setsansfont{TeX Gyre Heros}[Scale=0.96]
+    }{
+      \IfFontExistsTF{Liberation Sans}{
+        \setsansfont{Liberation Sans}[Scale=0.96]
+      }{
+        % Fallback to default sans
+      }
+    }
+  }
+\else
+  \usepackage[utf8]{inputenc}
+  \usepackage[T1]{fontenc}
+  \usepackage{tgheros}
+  \renewcommand*\familydefault{\sfdefault}
+\fi
+
+\usepackage{microtype}
+\usepackage{tikz}
+\usetikzlibrary{calc, shapes.geometric, arrows.meta, positioning, shadows.blur}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, raster}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amssymb}
+
+% Remove default navigation symbols and set clean slide margins
+\setbeamertemplate{navigation symbols}{}
+\setbeamersize{text margin left=0.75cm, text margin right=0.75cm}
+
+% ------------------------------------------------------------------------------
+% Color Tokens: High-Contrast Modern FinTech & HackMeridian Transit Theme
+% ------------------------------------------------------------------------------
+\definecolor{hmNavyText}{HTML}{0F172A}    % Slate 900 (Dominant headers)
+\definecolor{hmSlateDark}{HTML}{1E293B}   % Slate 800 (Subheaders & strong text)
+\definecolor{hmBodyText}{HTML}{334155}    % Slate 700 (Body text, crisp & legible)
+\definecolor{hmMutedText}{HTML}{64748B}   % Slate 500 (Labels & secondary notes)
+\definecolor{hmLightBorder}{HTML}{E2E8F0} % Slate 200 (Clean hairline dividers)
+\definecolor{hmLightBg}{HTML}{F8FAFC}     % Slate 50 (Slide background)
+\definecolor{hmWhite}{HTML}{FFFFFF}
+
+% Accent Palette
+\definecolor{hmYellow}{HTML}{F59E0B}      % Amber 500 (Vibrant brand gold)
+\definecolor{hmYellowDark}{HTML}{B45309}  % Amber 700 (Contrast accent)
+\definecolor{hmYellowLight}{HTML}{FEF3C7} % Amber 100 (Subtle badge fill)
+\definecolor{hmCyan}{HTML}{0EA5E9}        % Sky 500 (Transit/Web3 cyan)
+\definecolor{hmCyanLight}{HTML}{E0F2FE}   % Sky 100
+\definecolor{hmGreen}{HTML}{10B981}       % Emerald 500 (Success/Verification)
+\definecolor{hmGreenLight}{HTML}{D1FAE5}  % Emerald 100
+\definecolor{hmGreenDark}{HTML}{047857}   % Emerald 700
+\definecolor{hmRed}{HTML}{EF4444}         % Rose/Red 500 (Problem/Pain point)
+\definecolor{hmRedLight}{HTML}{FEE2E2}    % Rose 100
+\definecolor{hmRedDark}{HTML}{B91C1C}     % Rose 700
+
+% Dark Theme Tokens (Slide 1 Hero)
+\definecolor{hmDarkBg}{HTML}{0B0F19}      % Pitch navy
+\definecolor{hmDarkCard}{HTML}{131B2E}    % Elevated card
+\definecolor{hmDarkBorder}{HTML}{1E293B}  % Subtle border
+\definecolor{hmSilver}{HTML}{CBD5E1}      % Slate 300 (Hero description)
+
+% Global font color settings for Beamer
+\setbeamercolor{normal text}{fg=hmBodyText, bg=hmLightBg}
+\setbeamercolor{structure}{fg=hmNavyText}
+
+% ------------------------------------------------------------------------------
+% Top Navigation Rail & Title Banner (Slides 2 - 5)
+% ------------------------------------------------------------------------------
+\newcommand{\slidebanner}[5]{%
+  % Fixed top rail navigation bar (strictly at the top of the canvas)
+  \begin{tikzpicture}[remember picture, overlay]
+    % Hairline top divider
+    \draw[color=hmLightBorder, line width=0.75pt] 
+      ($(current page.north west) + (0.75cm, -0.68cm)$) -- 
+      ($(current page.north east) + (-0.75cm, -0.68cm)$);
+    
+    % Metro Platform Pill (Left)
+    \node[anchor=west, inner sep=0pt] at ($(current page.north west) + (0.75cm, -0.38cm)$) {%
+      \tikz{
+        \node[fill=hmYellow, text=hmNavyText, rounded corners=2pt, inner xsep=5pt, inner ysep=2.2pt, font=\fontsize{6.5}{7.5}\selectfont\bfseries] {#1};
+      }%
+    };
+    
+    % Event Marker (Center)
+    \node[anchor=center, font=\fontsize{7}{8}\selectfont\bfseries, text=hmMutedText, inner sep=0pt] 
+      at ($(current page.north) + (0cm, -0.38cm)$) {HACKMERIDIAN 2026 \textcolor{hmYellow}{·} LISBON};
+    
+    % Next Step / Route Tag (Right)
+    \node[anchor=east, font=\fontsize{6.5}{7.5}\selectfont\bfseries, text=hmSlateDark, inner sep=0pt] 
+      at ($(current page.north east) + (-0.75cm, -0.38cm)$) {#2};
+  \end{tikzpicture}%
+  % Generous vertical clearance so the slide body starts comfortably below the top rail
+  \vspace*{0.85cm}%
+  \noindent%
+  \begin{minipage}{\textwidth}
+    % Slide Title
+    {\fontsize{13.5}{16}\selectfont\bfseries\textcolor{hmNavyText}{#3}\par}\vspace{2pt}%
+    % Slide Headline (High contrast dark slate)
+    {\fontsize{8.5}{11}\selectfont\bfseries\textcolor{hmSlateDark}{#4}\par}\vspace{1.5pt}%
+    % Slide Description
+    {\fontsize{7}{9}\selectfont\textcolor{hmMutedText}{#5}\par}
+  \end{minipage}\par%
+}
+
+% Slide Footer (Slides 2 - 5)
+\newcommand{\slidefooter}{%
+  \begin{tikzpicture}[remember picture, overlay]
+    \draw[color=hmLightBorder, line width=0.5pt] 
+      ($(current page.south west) + (0.75cm, 0.52cm)$) -- 
+      ($(current page.south east) + (-0.75cm, 0.52cm)$);
+    \node[anchor=west, font=\fontsize{6}{7}\selectfont, text=hmMutedText] 
+      at ($(current page.south west) + (0.75cm, 0.30cm)$) {\copyright\ 2026 HackMeridian · Lisbon · \#HackMeridian26};
+    \node[anchor=east, font=\fontsize{6}{7}\selectfont\bfseries, text=hmSlateDark] 
+      at ($(current page.south east) + (-0.75cm, 0.30cm)$) {%
+        \tikz[baseline=-2pt]{
+          \node[fill=hmNavyText, text=hmWhite, rounded corners=1.5pt, inner xsep=3.5pt, inner ysep=1.5pt, font=\fontsize{5}{6}\selectfont\bfseries] {HM};
+        }
+        \hspace{0.12cm}HackMeridian · Lisbon
+      };
+  \end{tikzpicture}%
+}
+
+% Title for slides without the navigation header and footer
+\newcommand{\slidetitle}[1]{%
+  \vspace*{0.35cm}%
+  {\fontsize{13.5}{16}\selectfont\bfseries\textcolor{hmNavyText}{#1}\par}%
+  \vspace{0.18cm}%
+}
+
+\begin{document}
+
+% ==============================================================================
+% SLIDE 1: Title / Introduction (Platform 01 / 05)
+% ==============================================================================
+{
+\setbeamercolor{background canvas}{bg=hmDarkBg}
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+    % Ambient lighting / Lisbon transit glow
+    \shade[inner color=hmYellow!14, outer color=hmDarkBg, opacity=0.8] 
+      ($(current page.center) + (3.5cm, 1.5cm)$) circle (6.5cm);
+
+    % Top Rail: Station and Platform
+    \draw[color=hmDarkBorder, line width=0.8pt] 
+      ($(current page.north west) + (0.8cm, -0.65cm)$) -- 
+      ($(current page.north east) + (-0.8cm, -0.65cm)$);
+    
+    \node[anchor=west, font=\fontsize{7}{8}\selectfont\bfseries, text=hmYellow] 
+      at ($(current page.north west) + (0.8cm, -0.42cm)$) {HACKMERIDIAN 2026 \textcolor{hmMutedText}{·} LISBON};
+
+    % Subheader Badge: Pitch Deck · Made to Move
+    \node[anchor=west, inner sep=0pt] at ($(current page.north west) + (0.8cm, -1.35cm)$) {%
+      \tikz{
+        \node[fill=hmDarkCard, draw=hmDarkBorder, text=hmCyan, rounded corners=3pt, inner xsep=6pt, inner ysep=3pt, font=\fontsize{6.5}{7.5}\selectfont\bfseries] {PITCH DECK \textcolor{hmMutedText}{·} MADE TO MOVE};
+      }%
+    };
+
+    % Main Title: PayRaast
+    \node[anchor=west, font=\fontsize{36}{40}\selectfont\bfseries, inner sep=0pt] 
+      at ($(current page.north west) + (0.8cm, -2.55cm)$) {%
+        \textcolor{hmWhite}{Pay}\textcolor{hmYellow}{Raast}%
+      };
+
+    % Tagline
+    \node[anchor=west, font=\fontsize{15}{18}\selectfont\bfseries, text=hmWhite, inner sep=0pt] 
+      at ($(current page.north west) + (0.8cm, -3.50cm)$) {Get paid globally. Cash out locally.};
+
+    % Description
+    \node[anchor=west, font=\fontsize{10}{13}\selectfont, text=hmSilver, inner sep=0pt] 
+      at ($(current page.north west) + (0.8cm, -4.20cm)$) {Cross-border stablecoin payments for Pakistani freelancers.};
+
+    % Transit Metro Route Flow Graphic
+    \node[anchor=west, inner sep=0pt] at ($(current page.north west) + (0.8cm, -5.35cm)$) {%
+      \begin{tikzpicture}[scale=0.96, every node/.style={transform shape}]
+        % Metro Track Line
+        \draw[color=hmYellow, line width=2.5pt] (0, 0) -- (12.2, 0);
+        
+        % Station 1
+        \fill[color=hmDarkBg] (0.8, 0) circle (6pt);
+        \fill[color=hmYellow] (0.8, 0) circle (3.5pt);
+        \node[above, font=\fontsize{7.5}{9}\selectfont\bfseries, text=hmWhite] at (0.8, 0.25) {Create Invoice};
+        \node[below, font=\fontsize{6}{7}\selectfont, text=hmSilver] at (0.8, -0.22) {Freelancer App};
+
+        % Station 2
+        \fill[color=hmDarkBg] (4.5, 0) circle (6pt);
+        \fill[color=hmYellow] (4.5, 0) circle (3.5pt);
+        \node[above, font=\fontsize{7.5}{9}\selectfont\bfseries, text=hmWhite] at (4.5, 0.25) {Payment Link};
+        \node[below, font=\fontsize{6}{7}\selectfont, text=hmSilver] at (4.5, -0.22) {Client Portal};
+
+        % Station 3
+        \fill[color=hmDarkBg] (8.2, 0) circle (6pt);
+        \fill[color=hmCyan] (8.2, 0) circle (3.5pt);
+        \node[above, font=\fontsize{7.5}{9}\selectfont\bfseries, text=hmWhite] at (8.2, 0.25) {Stellar Testnet};
+        \node[below, font=\fontsize{6}{7}\selectfont, text=hmCyan] at (8.2, -0.22) {Wallet Signing};
+
+        % Station 4
+        \fill[color=hmDarkBg] (11.6, 0) circle (6pt);
+        \fill[color=hmGreen] (11.6, 0) circle (3.5pt);
+        \node[above, font=\fontsize{7.5}{9}\selectfont\bfseries, text=hmWhite] at (11.6, 0.25) {Verified Receipt};
+        \node[below, font=\fontsize{6}{7}\selectfont, text=hmGreen] at (11.6, -0.22) {Horizon Verification};
+      \end{tikzpicture}%
+    };
+
+    % Event Badge Footer
+    \draw[color=hmDarkBorder, line width=0.5pt] 
+      ($(current page.south west) + (0.8cm, 0.85cm)$) -- 
+      ($(current page.south east) + (-0.8cm, 0.85cm)$);
+
+    \node[anchor=west, font=\fontsize{6.5}{7.5}\selectfont, text=hmMutedText] 
+      at ($(current page.south west) + (0.8cm, 0.48cm)$) {October 2026 \textcolor{hmYellow}{·} \#HackMeridian26 \textcolor{hmYellow}{·} \copyright\ 2026 HackMeridian · Lisbon};
+
+    % Partner / Sponsor Badges on Title Slide
+    \node[anchor=east, inner sep=0pt] at ($(current page.south east) + (-0.8cm, 0.48cm)$) {%
+      \tikz[baseline=-2pt]{
+        \node[fill=hmDarkCard, draw=hmDarkBorder, rounded corners=2pt, inner xsep=4.5pt, inner ysep=2.5pt, font=\fontsize{6}{7}\selectfont\bfseries, text=hmWhite] {HackMeridian};
+        \hspace{0.15cm}
+        \node[fill=hmDarkCard, draw=hmDarkBorder, rounded corners=2pt, inner xsep=4.5pt, inner ysep=2.5pt, font=\fontsize{6}{7}\selectfont\bfseries, text=hmWhite] {Guava};
+        \hspace{0.15cm}
+        \node[fill=hmDarkCard, draw=hmCyan!50, rounded corners=2pt, inner xsep=4.5pt, inner ysep=2.5pt, font=\fontsize{6}{7}\selectfont\bfseries, text=hmCyan] {Built on Stellar};
+      }%
+    };
+  \end{tikzpicture}
+\end{frame}
+}
+
+% ==============================================================================
+% SLIDE 2: The Solution (Platform 02 / 05)
+% ==============================================================================
+\begin{frame}[plain]
+  \slidetitle{THE SOLUTION}
+  % Three Solution Feature Cards
+  \begin{tcbitemize}[raster columns=3, raster equal height, raster column skip=0.35cm,
+    sharp corners, boxrule=0.75pt, colframe=hmLightBorder, colback=hmWhite,
+    top=6pt, bottom=6pt, left=8pt, right=8pt, enhanced,
+    drop fuzzy shadow=gray!12]
+    
+    \tcbitem
+      \begin{tikzpicture}[baseline=0pt]
+        \node[circle, fill=hmYellowLight, draw=hmYellow!50, line width=0.5pt, text=hmYellowDark, inner sep=2.5pt, font=\fontsize{6.5}{7.5}\selectfont\bfseries] {1};
+      \end{tikzpicture}
+      \hspace{0.05cm}
+      {\fontsize{8.5}{10.5}\selectfont\bfseries\textcolor{hmNavyText}{Create Invoice}}\\[0.12cm]
+      {\fontsize{7}{9.5}\selectfont\textcolor{hmBodyText}{Generate professional, structured invoices with explicit service scopes, customer metadata, and exact USDC amounts on Stellar Testnet.}}
+
+    \tcbitem
+      \begin{tikzpicture}[baseline=0pt]
+        \node[circle, fill=hmYellowLight, draw=hmYellow!50, line width=0.5pt, text=hmYellowDark, inner sep=2.5pt, font=\fontsize{6.5}{7.5}\selectfont\bfseries] {2};
+      \end{tikzpicture}
+      \hspace{0.05cm}
+      {\fontsize{8.5}{10.5}\selectfont\bfseries\textcolor{hmNavyText}{Share Direct Link}}\\[0.12cm]
+      {\fontsize{7}{9.5}\selectfont\textcolor{hmBodyText}{Clients open a zero-friction payment portal, connect any compatible Stellar wallet (e.g. Freighter), and sign transaction directly.}}
+
+    \tcbitem
+      \begin{tikzpicture}[baseline=0pt]
+        \node[circle, fill=hmGreenLight, draw=hmGreen!50, line width=0.5pt, text=hmGreenDark, inner sep=2.5pt, font=\fontsize{6.5}{7.5}\selectfont\bfseries] {3};
+      \end{tikzpicture}
+      \hspace{0.05cm}
+      {\fontsize{8.5}{10.5}\selectfont\bfseries\textcolor{hmNavyText}{Verify \& Settle}}\\[0.12cm]
+      {\fontsize{7}{9.5}\selectfont\textcolor{hmBodyText}{Express backend independently validates on-chain transaction details on Horizon, updates invoice state, and issues audit-ready receipts.}}
+
+  \end{tcbitemize}
+
+  \vspace{0.20cm}
+
+  % Differentiator Callout Box (Modern Left-Accent Bar)
+  \begin{tcolorbox}[colframe=hmLightBorder, colback=hmWhite, boxrule=0.75pt, leftrule=3.5pt,
+    borderline west={3.5pt}{0pt}{hmYellow}, rounded corners, left=9pt, right=9pt, top=5pt, bottom=5pt,
+    enhanced, drop fuzzy shadow=gray!10]
+    \noindent\textbf{\fontsize{7.5}{9.5}\selectfont\textcolor{hmYellowDark}{Key Differentiator:}} 
+    {\fontsize{7.2}{9.2}\selectfont\textcolor{hmSlateDark}{A purpose-built, freelancer-first payment workflow with an architectural path toward local currency access, bridging global Web3 client payments with domestic Pakistani financial rails.}}
+  \end{tcolorbox}
+
+\end{frame}
+
+% ==============================================================================
+% SLIDE 3: PMF / Problem (Platform 03 / 05)
+% ==============================================================================
+\begin{frame}[plain]
+  \slidetitle{PMF}
+  % Three Problem Cards
+  \begin{tcbitemize}[raster columns=3, raster equal height, raster column skip=0.35cm,
+    sharp corners, boxrule=0.75pt, colframe=hmLightBorder, colback=hmWhite,
+    top=6pt, bottom=6pt, left=8pt, right=8pt, enhanced,
+    drop fuzzy shadow=gray!12]
+    
+    \tcbitem
+      \begin{tikzpicture}[baseline=0pt]
+        \node[fill=hmRedLight, text=hmRedDark, rounded corners=2pt, inner xsep=4pt, inner ysep=1.5pt, font=\fontsize{5.5}{6.5}\selectfont\bfseries] {BARRIER 01};
+      \end{tikzpicture}\\[0.10cm]
+      {\fontsize{8.5}{10.5}\selectfont\bfseries\textcolor{hmNavyText}{High Fees \& Delays}}\\[0.10cm]
+      {\fontsize{7}{9.5}\selectfont\textcolor{hmBodyText}{Cross-border wire transfers and legacy platforms incur 5--12\% in fees, multi-day clearing delays, and arbitrary eligibility restrictions for Pakistani talent.}}
+
+    \tcbitem
+      \begin{tikzpicture}[baseline=0pt]
+        \node[fill=hmRedLight, text=hmRedDark, rounded corners=2pt, inner xsep=4pt, inner ysep=1.5pt, font=\fontsize{5.5}{6.5}\selectfont\bfseries] {BARRIER 02};
+      \end{tikzpicture}\\[0.10cm]
+      {\fontsize{8.5}{10.5}\selectfont\bfseries\textcolor{hmNavyText}{Raw Addresses Lack Context}}\\[0.10cm]
+      {\fontsize{7}{9.5}\selectfont\textcolor{hmBodyText}{Sharing a bare public key provides no invoice record, no status tracking, no automated accounting reconciliation, and no professional client receipts.}}
+
+    \tcbitem
+      \begin{tikzpicture}[baseline=0pt]
+        \node[fill=hmRedLight, text=hmRedDark, rounded corners=2pt, inner xsep=4pt, inner ysep=1.5pt, font=\fontsize{5.5}{6.5}\selectfont\bfseries] {BARRIER 03};
+      \end{tikzpicture}\\[0.10cm]
+      {\fontsize{8.5}{10.5}\selectfont\bfseries\textcolor{hmNavyText}{The Local Currency Gap}}\\[0.10cm]
+      {\fontsize{7}{9.5}\selectfont\textcolor{hmBodyText}{Receiving digital assets does not automatically provide a reliable, compliant way to convert funds into Pakistani Rupee (PKR) and withdraw locally.}}
+
+  \end{tcbitemize}
+
+  \vspace{0.20cm}
+
+  % Target Users Callout Box
+  \begin{tcolorbox}[colframe=hmNavyText, colback=hmNavyText, boxrule=0.75pt,
+    rounded corners, left=9pt, right=9pt, top=5pt, bottom=5pt]
+    \noindent\textbf{\fontsize{7.5}{9.5}\selectfont\textcolor{hmYellow}{Target Audience:}} 
+    {\fontsize{7.2}{9.2}\selectfont\textcolor{hmWhite}{Pakistani freelancers and independent professionals working with international clients across engineering, design, marketing, and content creation.}}
+  \end{tcolorbox}
+
+\end{frame}
+
+% ==============================================================================
+% SLIDE 4: Technical Workflow (Platform 04 / 05)
+% ==============================================================================
+\begin{frame}[plain]
+  \slidetitle{TECHNICAL WORKFLOW}
+  % TikZ 6-Step Workflow Diagram
+  \noindent
+  \begin{tikzpicture}[
+    node distance=0.20cm,
+    stepbox/.style={
+      draw=hmLightBorder, line width=0.75pt, fill=hmWhite,
+      rounded corners=3pt, text width=2.0cm, minimum height=1.35cm,
+      align=center, inner sep=3pt, drop shadow={opacity=0.08, shadow xshift=0.5pt, shadow yshift=-0.5pt}
+    },
+    arr/.style={-{Stealth[scale=0.8]}, line width=1.1pt, color=hmYellow}
+  ]
+    \node[stepbox] (s1) {
+      {\fontsize{5.2}{6.2}\selectfont\bfseries\textcolor{hmYellowDark}{01 · INVOICE}}\\[0.03cm]
+      {\fontsize{6.8}{8}\selectfont\bfseries\textcolor{hmNavyText}{Freelancer}}\\[0.02cm]
+      {\fontsize{5.3}{6.5}\selectfont\textcolor{hmBodyText}{Creates invoice with title, amount \& asset}}
+    };
+
+    \node[stepbox, right=of s1] (s2) {
+      {\fontsize{5.2}{6.2}\selectfont\bfseries\textcolor{hmYellowDark}{02 · SHARE}}\\[0.03cm]
+      {\fontsize{6.8}{8}\selectfont\bfseries\textcolor{hmNavyText}{Client}}\\[0.02cm]
+      {\fontsize{5.3}{6.5}\selectfont\textcolor{hmBodyText}{Opens shareable web payment link}}
+    };
+
+    \node[stepbox, right=of s2] (s3) {
+      {\fontsize{5.2}{6.2}\selectfont\bfseries\textcolor{hmYellowDark}{03 · SIGN}}\\[0.03cm]
+      {\fontsize{6.8}{8}\selectfont\bfseries\textcolor{hmNavyText}{Freighter}}\\[0.02cm]
+      {\fontsize{5.3}{6.5}\selectfont\textcolor{hmBodyText}{Signs Stellar Testnet transaction}}
+    };
+
+    \node[stepbox, right=of s3] (s4) {
+      {\fontsize{5.2}{6.2}\selectfont\bfseries\textcolor{hmGreenDark}{04 · VERIFY}}\\[0.03cm]
+      {\fontsize{6.8}{8}\selectfont\bfseries\textcolor{hmNavyText}{Backend}}\\[0.02cm]
+      {\fontsize{5.3}{6.5}\selectfont\textcolor{hmBodyText}{Verifies tx details independently on Horizon}}
+    };
+
+    \node[stepbox, right=of s4] (s5) {
+      {\fontsize{5.2}{6.2}\selectfont\bfseries\textcolor{hmGreenDark}{05 · STATE}}\\[0.03cm]
+      {\fontsize{6.8}{8}\selectfont\bfseries\textcolor{hmNavyText}{Database}}\\[0.02cm]
+      {\fontsize{5.3}{6.5}\selectfont\textcolor{hmBodyText}{SQLite updates status with replay protection}}
+    };
+
+    \node[stepbox, right=of s5] (s6) {
+      {\fontsize{5.2}{6.2}\selectfont\bfseries\textcolor{hmGreenDark}{06 · RECEIPT}}\\[0.03cm]
+      {\fontsize{6.8}{8}\selectfont\bfseries\textcolor{hmNavyText}{Audit Receipt}}\\[0.02cm]
+      {\fontsize{5.3}{6.5}\selectfont\textcolor{hmBodyText}{Displays verified hash \& Testnet Explorer link}}
+    };
+
+    \draw[arr] (s1) -- (s2);
+    \draw[arr] (s2) -- (s3);
+    \draw[arr] (s3) -- (s4);
+    \draw[arr] (s4) -- (s5);
+    \draw[arr] (s5) -- (s6);
+  \end{tikzpicture}
+
+  \vspace{0.20cm}
+
+  % Stack Breakdown (Implemented vs Planned)
+  \begin{tcolorbox}[colframe=hmLightBorder, colback=hmWhite, boxrule=0.75pt,
+    rounded corners, left=8pt, right=8pt, top=5pt, bottom=5pt,
+    enhanced, drop fuzzy shadow=gray!10]
+    \begin{columns}[T]
+      \begin{column}{0.56\textwidth}
+        \tikz[baseline=-2pt]{\node[fill=hmGreenLight, text=hmGreenDark, rounded corners=2pt, inner xsep=4pt, inner ysep=1.5pt, font=\fontsize{5.5}{6.5}\selectfont\bfseries]{DEMO-READY MVP STACK};}
+        \vspace{0.08cm}\par
+        {\fontsize{6.5}{8.2}\selectfont\textcolor{hmBodyText}{
+          \textbf{Frontend:} React, TypeScript, Vite, Tailwind CSS, Freighter API\\
+          \textbf{Backend:} Node.js, Express, TypeScript, SQLite, Stellar SDK\\
+          \textbf{Network:} Stellar Testnet (Verified on Horizon, Replay-Protected)
+        }}
+      \end{column}
+      \begin{column}{0.42\textwidth}
+        \tikz[baseline=-2pt]{\node[fill=hmCyanLight, text=hmCyan, rounded corners=2pt, inner xsep=4pt, inner ysep=1.5pt, font=\fontsize{5.5}{6.5}\selectfont\bfseries]{FUTURE DIRECTION (PLANNED)};}
+        \vspace{0.08cm}\par
+        {\fontsize{6.5}{8.2}\selectfont\textcolor{hmBodyText}{
+          Explore suitable Stellar anchors (SEP-24 / SEP-31) and authorized off-ramp providers for direct PKR payouts to Pakistani bank accounts.
+        }}
+      \end{column}
+    \end{columns}
+  \end{tcolorbox}
+
+\end{frame}
+
+% ==============================================================================
+% SLIDE 5: The Team (Platform 05 / 05 · Final Stop)
+% ==============================================================================
+\begin{frame}[plain]
+  \slidetitle{THE TEAM}
+  \begin{columns}[T]
+    % Left Column: Founder Profile Card
+    \begin{column}{0.54\textwidth}
+      \begin{tcolorbox}[colframe=hmLightBorder, colback=hmWhite, boxrule=0.75pt,
+        sharp corners, left=9pt, right=9pt, top=7pt, bottom=7pt, enhanced,
+        drop fuzzy shadow=gray!12]
+        
+        \begin{tikzpicture}[baseline=0pt]
+          % Stylized avatar badge with amber ring
+          \draw[color=hmYellow, line width=1.5pt] (0, 0) circle (8.5pt);
+          \node[circle, fill=hmNavyText, text=hmWhite, inner sep=3.5pt, font=\fontsize{8.5}{9.5}\selectfont\bfseries] at (0, 0) {H};
+        \end{tikzpicture}
+        \hspace{0.15cm}
+        \begin{minipage}[b]{0.75\textwidth}
+          {\fontsize{10}{12}\selectfont\bfseries\textcolor{hmNavyText}{Hakeem}}\\[0.03cm]
+          {\fontsize{7}{8.5}\selectfont\bfseries\textcolor{hmYellowDark}{Founder \& Full-Stack Engineer}}
+        \end{minipage}
+
+        \vspace{0.20cm}
+        {\fontsize{6.8}{9.2}\selectfont\textcolor{hmBodyText}{
+          \begin{itemize}\setlength{\itemsep}{2.5pt}\setlength{\leftmargin}{10pt}
+            \item[--] \textbf{5+ Years Experience:} Proven track record building production web platforms, resilient backend APIs, and distributed systems.
+            \item[--] \textbf{Web3 \& FinTech:} Hands-on experience with blockchain protocols, wallet architectures, and secure payment integrations.
+            \item[--] \textbf{Hackathon MVP:} Designed, engineered, and shipped PayRaast end-to-end on Stellar Testnet for HackMeridian 2026.
+          \end{itemize}
+        }}
+      \end{tcolorbox}
+    \end{column}
+
+    % Right Column: Vision & HackMeridian Commitment
+    \begin{column}{0.44\textwidth}
+      \begin{tcolorbox}[colframe=hmNavyText, colback=hmNavyText, boxrule=0.75pt,
+        sharp corners, left=9pt, right=9pt, top=7pt, bottom=7pt, enhanced,
+        drop fuzzy shadow=gray!12]
+        
+        {\fontsize{6.5}{7.5}\selectfont\bfseries\textcolor{hmYellow}{HACKMERIDIAN 2026 · LISBON}}\\[0.05cm]
+        {\fontsize{9.5}{11.5}\selectfont\bfseries\textcolor{hmWhite}{Solving the Last-Mile on Stellar}}\\[0.14cm]
+        
+        {\fontsize{6.8}{9.2}\selectfont\textcolor{hmSilver}{
+          Pakistan is the world's 4th largest freelancing hub, but talent loses substantial earnings to multi-day clearing delays, high wire fees, and payment friction.\\[0.12cm]
+          Stellar provides the high-speed, sub-cent settlement rails needed for modern cross-border freelancing. PayRaast turns that into an audit-ready invoicing product.
+        }}
+
+        \vspace{0.20cm}
+        \tikz{
+          \node[fill=hmDarkCard, draw=hmCyan!50, rounded corners=2pt, inner xsep=5pt, inner ysep=2.5pt, font=\fontsize{5.5}{6.5}\selectfont\bfseries, text=hmCyan] {MVP Focus: Verifiable Testnet Settlement};
+        }
+      \end{tcolorbox}
+    \end{column}
+  \end{columns}
+
+\end{frame}
+
+\end{document}
